@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Pocket Wallet",
+    "slug": "pocket-wallet",
+    "scheme": "pocketwallet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": { "supportsTablet": true, "infoPlist": { "NSFaceIDUsageDescription": "Unlock your wallet with Face ID" } },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      ["@stripe/stripe-react-native", { "merchantIdentifier": "merchant.dev.megoo.wallet" }]
+    ],
+    "extra": { "apiUrl": "http://localhost:4000", "stripePublishableKey": "pk_test_xxx" }
+  }
+}

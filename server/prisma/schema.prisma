@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  wallet       Wallet?
+}
+
+model Wallet {
+  id        String        @id @default(cuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id])
+  balance   Int           @default(0) // cents
+  currency  String        @default("USD")
+  entries   LedgerEntry[]
+  updatedAt DateTime      @updatedAt
+}
+
+enum EntryType {
+  TOPUP
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+model LedgerEntry {
+  id             String    @id @default(cuid())
+  walletId       String
+  wallet         Wallet    @relation(fields: [walletId], references: [id])
+  type           EntryType
+  amount         Int // cents, always positive; direction comes from type
+  balanceAfter   Int
+  counterparty   String? // email of the other user for transfers
+  reference      String? // stripe payment intent id or transfer group id
+  createdAt      DateTime  @default(now())
+
+  @@index([walletId, createdAt])
+}
+
+model IdempotencyKey {
+  key       String   @id
+  userId    String
+  response  Json
+  createdAt DateTime @default(now())
+}
+
+model ProcessedPayment {
+  paymentIntentId String   @id
+  createdAt       DateTime @default(now())
+}
